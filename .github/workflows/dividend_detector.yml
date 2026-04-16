@@ -1,0 +1,28 @@
+name: Dividend Detector
+
+on:
+  schedule:
+    - cron: '30 7 * * 1-5'   # Lun–Ven à 07h30 UTC (09h30 Paris, 15h30 Tokyo ouvert)
+  workflow_dispatch:           # Déclenchement manuel possible
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run dividend detector
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          SPREADSHEET_IDS: ${{ secrets.SPREADSHEET_IDS }}
+        run: python dividend_detector.py
